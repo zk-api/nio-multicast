@@ -15,7 +15,7 @@ public class Client {
         String localHost = "192.168.1.107";
         int port = 10000;
         String networkInterf = "192.168.1.107";
-        String multicastHost = "224.0.0.1";
+        String multicastHost = "232.0.0.1";
         send(localHost, port, networkInterf, multicastHost);
     }
 
@@ -26,17 +26,14 @@ public class Client {
             InetAddress source = InetAddress.getByName(localHost);
 
             DatagramChannel channel = DatagramChannel.open(StandardProtocolFamily.INET)
-                    .setOption(StandardSocketOptions.SO_REUSEADDR, true)
-                    .bind(new InetSocketAddress(port));
+                    .setOption(StandardSocketOptions.SO_REUSEADDR, true);
             channel.configureBlocking(false);
 //            channel.join(group, interf, source);
             channel.join(group, interf);
             while (true) {
-//                ByteBuffer buffer = ByteBuffer.wrap(new Date().toString().getBytes());
-//                buffer.flip();
-                ByteBuffer buffer = ByteBuffer.allocate(8192);
-                buffer.put(new Date().toString().getBytes());
+                ByteBuffer buffer = ByteBuffer.wrap(new Date().toString().getBytes());
                 channel.send(buffer,new InetSocketAddress(port));
+                System.out.println("发送数据:" + new String(buffer.array()));
                 Thread.sleep(1000);
             }
 

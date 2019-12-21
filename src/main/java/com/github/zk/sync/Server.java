@@ -23,7 +23,7 @@ public class Server {
         String localHost = "192.168.1.107";
         int port = 10000;
         String networkInterf = "192.168.1.107";
-        String multicastHost = "224.0.0.1";
+        String multicastHost = "232.0.0.1";
         receive(localHost, port, networkInterf, multicastHost);
     }
 
@@ -44,10 +44,11 @@ public class Server {
             channel.configureBlocking(true);
 //            channel.join(group, interf, source);
             channel.join(group, interf);
+            System.out.println("服务端准备接收......");
             while (true) {
                 ByteBuffer buffer = ByteBuffer.allocate(8192);
                 channel.receive(buffer);
-
+                buffer.flip();
                 threadPool.execute(new Runnable() {
                     private ByteBuffer buffer;
                     public Runnable setBuffer(ByteBuffer buffer) {
@@ -56,13 +57,8 @@ public class Server {
                     }
                     @Override
                     public void run() {
-                        buffer.flip();
-                        System.out.print("【" + Thread.currentThread() + "】" + "线程执行:");
-                        byte[] bytes = new byte[buffer.limit()];
-                        while (buffer.hasRemaining()) {
-                            buffer.get(bytes);
-                            System.out.print(new String(bytes));
-                        }
+                        System.out.println("【" + Thread.currentThread() + "】" + "线程执行:" + new String(buffer.array(),0,
+                                buffer.limit()));
                         buffer.clear();
                     }
                 }.setBuffer(buffer));
