@@ -42,13 +42,17 @@ public class Server {
                     .setOption(StandardSocketOptions.SO_REUSEADDR, true)
                     .bind(new InetSocketAddress(port));
             channel.configureBlocking(true);
+            // 这里本地路由器没有设置组播源，因此先注释。
+            // 如果指定源，必须使用此方式加入组播组
 //            channel.join(group, interf, source);
+            //加入组播组
             channel.join(group, interf);
             System.out.println("服务端准备接收......");
             while (true) {
                 ByteBuffer buffer = ByteBuffer.allocate(8192);
                 channel.receive(buffer);
                 buffer.flip();
+                // 开启线程，防止此条数据延迟导致后续消息阻塞
                 threadPool.execute(new Runnable() {
                     private ByteBuffer buffer;
                     public Runnable setBuffer(ByteBuffer buffer) {
